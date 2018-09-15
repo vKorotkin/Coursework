@@ -67,7 +67,7 @@ function [coll_db, wall_coll_db] = get_collisions(pos, vel, d, box_dim)
         end    
 
         %Take smallest t_c and update the wall collision times
-        if t_c_x>t_c_y
+        if t_c_x<t_c_y
             wall_coll_db.walls(i)=cand_wall_x;
             wall_coll_db.coll_time(i)=t_c_x;
         else
