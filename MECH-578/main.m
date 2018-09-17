@@ -17,6 +17,7 @@ box_dim=3; %box dimension.
 
 %PRODUCTION SET
 n_molec=400;
+n_molec=100;
 d=0.1;
 m=1;
 spc=1;
@@ -63,10 +64,10 @@ for i=1:num_iter
     %[N,edges] = histcounts(speed,edges);
     %plot(edges,N);
     [coll_db, wall_coll_db] = get_collisions(pos, vel, d, box_dim);
-    %plot_positions(pos, fig_idx, box_dim, d, [])
+    plot_positions(pos, fig_idx, box_dim, d, [])
     [pos, vel,updated_idx] = solve_collision_and_update(coll_db, wall_coll_db, pos, vel);
-    %plot_positions(pos, fig_idx, box_dim, d, updated_idx)
-   % pause(0.1)
+    plot_positions(pos, fig_idx, box_dim, d, updated_idx)
+    pause(0.01)
 
     disp(i)
 end

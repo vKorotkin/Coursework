@@ -23,7 +23,7 @@ y_an=arrayfun(@(t) exp(-3)/a_1*(1-exp(-a_1*t)),t);
 figure
 plot(t,y_num); hold on
 plot(t,y_an); 
-legend('Numerical', 'Analytical, linearized about x=0, u=0')
+legend('Numerical', 'Analytical, linearized about x=[0;0], u=0')
 ylabel('Output y'); xlabel('Time t');
 title('Numerical solution comparison vs analytical linearization')
 
