@@ -1,13 +1,15 @@
 close all;clear all;clc
+%% MECH 578-Advanced Thermodynamics
+% Semester Project - Part 2 
+% Vassili Korotkine 18/09/2018
+
+%Outstanding questions: 
+%   -What statistics are required? Mean, stddev?
+%       -For c_x,c_y, c 
 
 %% SIMULATION OF N MOLECULES IN A M by M BOX IN TWO DIMENSIONAL PLANE
-% Need: 
-%   -Nested conditions for checking collision - check hard sphere dynamics
-%   -Velocity transfer
-%   -Maxwell distribution for sim init
-%All units here are relative to each other. 
-%PARAMETERS
 
+%PARAMETERS
 %DEBUGGING SET
 n_molec=4; %amount of molecules spaced out inside box
 d=0.5; %molecule diameter
@@ -17,7 +19,7 @@ box_dim=3; %box dimension.
 
 %PRODUCTION SET
 n_molec=400;
-n_molec=100;
+%n_molec=100;
 d=0.1;
 m=1;
 spc=1;
@@ -53,7 +55,7 @@ end
 
 
 %% PSEUDO CODE AS IN PROJECT INSTRUCTION, ADJUSTED FOR HAILE's TEXT DERIVATION
-num_iter=1000;
+num_iter=2000;
 
 fig_idx=1;
 figure(fig_idx)
@@ -64,10 +66,10 @@ for i=1:num_iter
     %[N,edges] = histcounts(speed,edges);
     %plot(edges,N);
     [coll_db, wall_coll_db] = get_collisions(pos, vel, d, box_dim);
-    plot_positions(pos, fig_idx, box_dim, d, [])
+ %   plot_positions(pos, fig_idx, box_dim, d, [])
     [pos, vel,updated_idx] = solve_collision_and_update(coll_db, wall_coll_db, pos, vel);
-    plot_positions(pos, fig_idx, box_dim, d, updated_idx)
-    pause(0.01)
+  %  plot_positions(pos, fig_idx, box_dim, d, updated_idx)
+%    pause(0.01)
 
     disp(i)
 end
