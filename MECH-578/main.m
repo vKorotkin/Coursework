@@ -24,6 +24,19 @@ d=0.1;
 m=1;
 spc=1;
 box_dim=22;
+num_iter=6000;
+
+%% 
+
+figure(1)
+set(findall(gcf,'-property','FontSize'),'FontSize',20)
+
+
+%%
+
+
+
+
 
 %% INITIALIZATION 
 %Initialize all molecules with random velocities.
@@ -55,7 +68,12 @@ end
 
 
 %% PSEUDO CODE AS IN PROJECT INSTRUCTION, ADJUSTED FOR HAILE's TEXT DERIVATION
-num_iter=2000;
+
+
+speed_avg=zeros(1,num_iter);
+speed_stddev=zeros(1,num_iter);
+vel_avg=zeros(2,num_iter);
+vel_stddev=zeros(2,num_iter);
 
 fig_idx=1;
 figure(fig_idx)
@@ -68,35 +86,55 @@ for i=1:num_iter
     [coll_db, wall_coll_db] = get_collisions(pos, vel, d, box_dim);
  %   plot_positions(pos, fig_idx, box_dim, d, [])
     [pos, vel,updated_idx] = solve_collision_and_update(coll_db, wall_coll_db, pos, vel);
-  %  plot_positions(pos, fig_idx, box_dim, d, updated_idx)
+    speed_avg(i)=mean(arrayfun(@(i) norm(vel(:,i)), 1:length(vel)));
+    speed_stddev(i)=std(arrayfun(@(i) norm(vel(:,i)), 1:length(vel)));
+    vel_avg(:,i)=mean(vel');
+    vel_stddev(:,i)=std(vel');
+
+     %plot_positions(pos, fig_idx, box_dim, d, updated_idx)
 %    pause(0.01)
 
-    disp(i)
+   % disp(i)
 end
 %%
-make_vel_dist_plots(vel, 2)
+plot_positions(pos, fig_idx, box_dim, d, updated_idx)
+
+
+fig_idx=2;
+figure(fig_idx)
+subplot(1,2,1)
+plot(speed_avg);ylabel('Average')
+subplot(1,2,2)
+plot(speed_stddev); ylabel('StdDev')
+
+fig_idx=3;
+figure(fig_idx)
+subplot(2,2,1)
+plot(vel_avg(1,:)); ylabel('Avg, V_x')
+subplot(2,2,2)
+plot(vel_stddev(1,:)); ylabel('StdDev, V_x')
+subplot(2,2,3)
+plot(vel_avg(2,:)); ylabel('Avg, V_y')
+subplot(2,2,4)
+plot(vel_stddev(2,:)); ylabel('StdDev, V_y')
+
+make_vel_dist_plots(vel, 4)
+
+
 time_taken=toc
 
+%%
+%Speed histogram
+speed=arrayfun(@(i) norm(vel(:,i)), 1:length(vel));
+[f, x] = hist(speed, 50);
+dx=diff(x(1:2)); 
+g=arrayfun(@(c) 2*c*exp(-c^2), x);
+bar(x, f / sum(f*dx)); hold on
+plot(x, g, 'r', 'LineWidth', 2); hold off
+legend('Numerical', 'Analytic')
     
 %Binning to get distributions
 
-function [] = make_vel_dist_plots(vel, fig_idx)
-
-speed=arrayfun(@(i) norm(vel(:,i)), 1:length(vel));
-
-edges=0:0.05:5;
-
-figure(fig_idx)
-subplot(1,3,1)
-histogram(speed, edges,'Normalization','probability')
-title('Speed dist')
-subplot(1,3,2)
-histogram(vel(1,:),'Normalization','probability')
-title('X Vel dist')
-subplot(1,3,3)
-histogram(vel(2,:),'Normalization','probability')
-title('Y Vel dist')
-end
 
 
 
