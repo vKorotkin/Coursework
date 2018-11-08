@@ -1,7 +1,7 @@
 %% MECH 513-Control Systems
 % Assignment 1 - Part 2, Question 12b). 
 % Simulate inverted pendulum uncontrolled dynamics
-% Vassili Korotkine 17/09/2018
+% Vassili Korotkine 24/09/2018
 
 
 clear all; close all; clc
@@ -12,32 +12,36 @@ global Lp; Lp = 0.337; % m
 global mr; mr = 0.257; % kg, mass
 global Lr; Lr = 0.216; % m
 global g; g = 9.81; % m/sˆ2
-t_f=2; %final time
+t_f=10; %final time
 x_0=[0 -15/180*pi 0 0]'; %initial condition
 
 %Tolerance values - copy paste from assignment instruction. 
 options = odeset('AbsTol',1e-10,'RelTol',1e-10);
-t=linspace(0,t_f,1000);
-[t,x]=ode45(@invPendNonLinSys, t, x_0, options);
-E=arrayfun(@(i) get_energy(x(i,:)), 1:length(x));
-E_stddev=std(E);
 
-figure(1)
-plot(t,E)
-title(sprintf('Energy vs Time, standard dev %.2e',E_stddev))
-xlabel('Time'); ylabel('Energy');
-ylim([0,1])
+%Solve system, plot system
+t=linspace(0,t_f,1000);
+%x contains [q, q_dot]' where q=[th, a] => x=[th,a,th_dot,a_dot]'
+[t,x]=ode45(@invPendNonLinSys, t, x_0, options);
+% E=arrayfun(@(i) get_energy(x(i,:)), 1:length(x));
+% E_stddev=std(E);
+% 
+% figure(1)
+% plot(t,E)
+% title(sprintf('Energy vs Time, standard dev %.2e',E_stddev))
+% xlabel('Time'); ylabel('Energy');
+% ylim([0,1])
+
 figure(2)
-plot(x(:,1), x(:,3))
+plot(x(:,2), x(:,4))
 title('Alpha vs AlphaDot')
 xlabel('Alpha,rad');ylabel('Alpha dot, rad/s')
 
-
-figure(3)
-plot(t, x(:,1)); hold on
-plot(t, x(:,2))
-xlabel('Time'); ylabel('Coord value')
-legend('Theta', 'Alpha')
+% 
+% figure(3)
+% plot(t, x(:,1)); hold on
+% plot(t, x(:,2))
+% xlabel('Time'); ylabel('Coord value')
+% legend('Theta', 'Alpha')
 
 
 function x_dot=invPendNonLinSys(t,x)

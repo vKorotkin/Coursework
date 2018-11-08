@@ -25,3 +25,14 @@ subplot(2,1,2)
 plot(myT, x2_an)
 ylabel('X_2')
 xlabel('Time (seconds)')
+
+
+
+%%
+clear all
+A=[2,0;-1,1]; B=[1;-1];
+C=[1,1]; D=zeros(1,1);
+
+mySys=ss(A,B,C,D);
+
+ctrb(mySys)

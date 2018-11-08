@@ -1,0 +1,93 @@
+%% MECH 578 Project Part 2
+% Numerically integrate Boltzmann equation for 1D gas as per 
+% Boltzmann equations for a binary one-dimensional ideal gas
+
+close all;clear all;clc
+
+%% Initialize
+%Variables
+
+N=100; %num particles 
+L=1; %length of wire 
+ma=1;
+mb=2;
+
+delta_t=0.1; %time step size 
+n_tsteps=2; %amount time steps to run for 
+delta_v=0.2; % velocity step size
+v_bound=2; %define velocity bound (symmetric)
+Nv=2*v_bound/delta_v+1; %size of velocity vec
+v=linspace(-v_bound, v_bound, Nv);
+
+pA=zeros(1,Nv);
+pB=zeros(1, Nv);
+%Initial condition
+pA(floor(Nv/4))=0.5/delta_v;
+pB(floor(Nv/4))=0.5/delta_v;
+pA(floor(Nv*3/4))=0.5/delta_v;
+pB(floor(Nv*3/4))=0.5/delta_v;
+
+
+for t_idx=1:n_tsteps
+
+        % i idx corresponds to updated p index j idx corresponds to dummy var;
+    % for pA updates: i is A, j is B
+    % for pB updates: i is B, j is A
+    for i=1:Nv
+        delta_pA=zeros(1,Nv);
+        delta_pB=zeros(1,Nv);
+        for j=1:Nv
+            %calc w_a, w_b - note we do this in same loop. recall defn's
+            %above, compare to EQs 9,10 in Boozer. 
+            w_a=((ma-mb)*v(i)+2*mb*v(j))/(ma+mb);
+            w_b=((mb-ma)*v(i)+2*ma*v(j))/(ma+mb);
+            
+            
+            %calc delta pA_i
+            delta_pA_i=delta_pA_i+ ...
+                abs(v(i)-v(j))* ...
+                (interp1q(v',pA',w_a)*interp1q(v',pB',w_b) - ...
+                interp1q(v',pA',v(i))*interp1q(v',pB',v(j)));
+        end
+    delta_pA(i)=delta_pA(i)*delta_v*N/L;
+
+    end
+    pA=pA+delta_p;
+    pB=pB_temp;
+    
+    
+    
+    %% Plot
+    subplot(1,2,1)
+    bar(v,pA)
+    xlabel('v'); 
+    ylabel('pA');
+    subplot(1,2,2)
+    bar(v, pB)
+    xlabel('v'); 
+    ylabel('pA');        
+    
+    pause(0.01);
+        
+end
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
