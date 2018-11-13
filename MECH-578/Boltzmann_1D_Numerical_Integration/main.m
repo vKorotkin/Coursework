@@ -9,11 +9,11 @@ close all;clear all;clc
 
 N=10; %num particles 
 L=1; %length of wire 
-ma=1;
-mb=2;
+ma=1; %mass a
+mb=2; % mass b
 
 delta_t=0.1; %time step size 
-n_tsteps=5; %amount time steps to run for 
+n_tsteps=100; %amount time steps to run for 
 delta_v=0.2; % velocity step size
 v_bound=2; %define velocity bound (symmetric)
 Nv=2*v_bound/delta_v+1; %size of velocity vec
@@ -33,41 +33,65 @@ pB=rand(1,Nv);
 
 for t_idx=1:n_tsteps
     %% Plot
-    subplot(1,2,1)
+    subplot(2,2,1)
     bar(v,pA)
     xlabel('v'); 
     ylabel('pA');
-    subplot(1,2,2)
+    subplot(2,2,2)
     bar(v, pB)
     xlabel('v'); 
-    ylabel('pA'); 
+    ylabel('pB'); 
     
+    delta_pA=zeros(1,Nv);
     for i=1:Nv
-        delta_pA=zeros(1,Nv);
-        for j=1:Nv
+        %disp(i)
+        for j=1:(Nv-2)
             w_a=((ma-mb)*v(i)+2*mb*v(j))/(ma+mb);
             w_b=((mb-ma)*v(j)+2*ma*v(i))/(ma+mb);
             
+            if abs(w_a)>v_bound
+                w_a=w_a/abs(w_a)*v_bound;
+            end
+            
+            if abs(w_b)>v_bound
+                w_b=w_b/abs(w_b)*v_bound;
+            end
+            
             delta_pA(i)=delta_pA(i)+ ...
                 abs(v(i)-v(j))* ...
-                (interp1q(v',pA',w_a)*interp1q(v',pB',w_b) - ...
-                interp1q(v',pA',v(i))*interp1q(v',pB',v(j)));
+                (interp1(v',pA',w_a,'nearest')*interp1(v',pB',w_b,'nearest') - ...
+                interp1(v',pA',v(i),'nearest')*interp1(v',pB',v(j),'nearest'));
+            if isnan(delta_pA(i))
+                print('abtin has shitty jokes')
+            end
+            
         end 
-        delta_pA=delta_pA*delta_v*N/L;
+        delta_pA=delta_pA*delta_v*delta_t*N/L;
     end
     
+    delta_pB=zeros(1,Nv);
     for i=1:Nv
-        delta_pB=zeros(1,Nv);
+        
         for j=1:Nv
             w_a=((ma-mb)*v(j)+2*mb*v(i))/(ma+mb);
             w_b=((mb-ma)*v(i)+2*ma*v(j))/(ma+mb);
             
-            delta_pA(i)=delta_pA(i)+ ...
+            
+            % due to round off error 
+            if abs(w_a)>v_bound
+                w_a=w_a/abs(w_a)*v_bound;
+            end
+            
+            if abs(w_b)>v_bound
+                w_b=w_b/abs(w_b)*v_bound;
+            end
+            
+            delta_pB(i)=delta_pB(i)+ ...
                 abs(v(i)-v(j))* ...
-                (interp1q(v',pA',w_a)*interp1q(v',pB',w_b) - ...
-                interp1q(v',pA',v(j))*interp1q(v',pB',v(i)));
+                (interp1(v',pA',w_a, 'nearest')*interp1(v',pB',w_b, 'nearest') - ...
+                interp1(v',pA',v(j), 'nearest')*interp1(v',pB',v(i), 'nearest'));
         end 
-        delta_pA=delta_pA*delta_v*N/L;
+        delta_pB=delta_pB*delta_v*delta_t*N/L;
     end
 
     
@@ -75,6 +99,15 @@ for t_idx=1:n_tsteps
     pB=pB+delta_pB;
     
     
+    subplot(2,2,3)
+    bar(v, delta_pA)
+    xlabel('v'); 
+    ylabel('delta_pA'); 
+    
+    subplot(2,2,4)
+    bar(v, delta_pB)
+    xlabel('v'); 
+    ylabel('delta_pB'); 
     
        
     
