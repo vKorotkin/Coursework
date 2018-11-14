@@ -30,9 +30,13 @@ pB(floor(Nv*3/4))=0.5/delta_v;
 pA=rand(1,Nv);
 pB=rand(1,Nv);
 
+pA=pA/(delta_v*sum(pA));
+pB=pB/(delta_v*sum(pB));
+
 
 for t_idx=1:n_tsteps
     %% Plot
+    title(sprintf('iter %d', t_idx))
     subplot(2,2,1)
     bar(v,pA)
     xlabel('v'); 
@@ -45,7 +49,8 @@ for t_idx=1:n_tsteps
     delta_pA=zeros(1,Nv);
     for i=1:Nv
         %disp(i)
-        for j=1:(Nv-2)
+        %summing loop, compute RHS integral for single value of v_i. 
+        for j=1:(Nv)
             w_a=((ma-mb)*v(i)+2*mb*v(j))/(ma+mb);
             w_b=((mb-ma)*v(j)+2*ma*v(i))/(ma+mb);
             
@@ -72,7 +77,7 @@ for t_idx=1:n_tsteps
     delta_pB=zeros(1,Nv);
     for i=1:Nv
         
-        for j=1:Nv
+        for j=1:(Nv)
             w_a=((ma-mb)*v(j)+2*mb*v(i))/(ma+mb);
             w_b=((mb-ma)*v(i)+2*ma*v(j))/(ma+mb);
             
