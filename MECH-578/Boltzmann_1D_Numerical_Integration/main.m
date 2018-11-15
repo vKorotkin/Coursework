@@ -12,10 +12,10 @@ L=1; %length of wire
 ma=1; %mass a
 mb=2; % mass b
 
-delta_t=0.1; %time step size 
+delta_t=0.01; %time step size 
 n_tsteps=100; %amount time steps to run for 
 delta_v=0.2; % velocity step size
-v_bound=2; %define velocity bound (symmetric)
+v_bound=5; %define velocity bound (symmetric)
 Nv=2*v_bound/delta_v+1; %size of velocity vec
 v=linspace(-v_bound, v_bound, Nv);
 
@@ -30,10 +30,18 @@ pB(floor(Nv*3/4))=0.5/delta_v;
 pA=rand(1,Nv);
 pB=rand(1,Nv);
 
+for i = 1:Nv
+    if abs(v(i))>1
+        pA(i)=0;
+        pB(i)=0;
+    end
+end
+
 pA=pA/(delta_v*sum(pA));
 pB=pB/(delta_v*sum(pB));
 
 
+n_steps=100;
 for t_idx=1:n_tsteps
     %% Plot
     title(sprintf('iter %d', t_idx))
@@ -50,8 +58,9 @@ for t_idx=1:n_tsteps
     for i=1:Nv
         %disp(i)
         %summing loop, compute RHS integral for single value of v_i. 
+        temp=0;
         for j=1:(Nv)
-            w_a=((ma-mb)*v(i)+2*mb*v(j))/(ma+mb);
+            w_a=((ma-mb)*v(i)+2*mb*v(j))/(ma+mb);  %majorly illegal, to be checked
             w_b=((mb-ma)*v(j)+2*ma*v(i))/(ma+mb);
             
             if abs(w_a)>v_bound
@@ -62,21 +71,24 @@ for t_idx=1:n_tsteps
                 w_b=w_b/abs(w_b)*v_bound;
             end
             
-            delta_pA(i)=delta_pA(i)+ ...
+            
+            
+            temp=temp+ ...
                 abs(v(i)-v(j))* ...
-                (interp1(v',pA',w_a,'nearest')*interp1(v',pB',w_b,'nearest') - ...
-                interp1(v',pA',v(i),'nearest')*interp1(v',pB',v(j),'nearest'));
+                (interp1(v',pA',w_a,'linear')*interp1(v',pB',w_b,'linear') - ...
+                interp1(v',pA',v(i),'linear')*interp1(v',pB',v(j),'linear'));
             if isnan(delta_pA(i))
                 print('abtin has shitty jokes')
             end
             
         end 
-        delta_pA=delta_pA*delta_v*delta_t*N/L;
+        delta_pA(i)=temp;
     end
+    delta_pA=delta_pA*delta_v*delta_t*N/L;
     
     delta_pB=zeros(1,Nv);
     for i=1:Nv
-        
+        temp=0;
         for j=1:(Nv)
             w_a=((ma-mb)*v(j)+2*mb*v(i))/(ma+mb);
             w_b=((mb-ma)*v(i)+2*ma*v(j))/(ma+mb);
@@ -91,14 +103,14 @@ for t_idx=1:n_tsteps
                 w_b=w_b/abs(w_b)*v_bound;
             end
             
-            delta_pB(i)=delta_pB(i)+ ...
+            temp=temp+ ...
                 abs(v(i)-v(j))* ...
-                (interp1(v',pA',w_a, 'nearest')*interp1(v',pB',w_b, 'nearest') - ...
-                interp1(v',pA',v(j), 'nearest')*interp1(v',pB',v(i), 'nearest'));
+                (interp1(v',pA',w_a, 'linear')*interp1(v',pB',w_b, 'linear') - ...
+                interp1(v',pA',v(j), 'linear')*interp1(v',pB',v(i), 'linear'));
         end 
-        delta_pB=delta_pB*delta_v*delta_t*N/L;
+        delta_pB(i)=temp;
     end
-
+    delta_pB=delta_pB*delta_v*delta_t*N/L;
     
     pA=pA+delta_pA;
     pB=pB+delta_pB;
@@ -116,7 +128,7 @@ for t_idx=1:n_tsteps
     
        
     
-    pause(0.5);
+    pause(0.001);
         
 end
     
