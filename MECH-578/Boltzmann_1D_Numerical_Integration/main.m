@@ -1,7 +1,7 @@
 %% MECH 578 Project Part 2
 % Numerically integrate Boltzmann equation for 1D gas as per 
 % Boltzmann equations for a binary one-dimensional ideal gas
-
+% Nov. 19 2018 - file transferred to group project repo. This file not updated since. 
 close all;clear all;clc
 
 %% Initialize
